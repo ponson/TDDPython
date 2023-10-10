@@ -12,6 +12,10 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
         return super().setUp()
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
     def tearDown(self) -> None:
         self.browser.quit()
@@ -24,20 +28,20 @@ class NewVisitorTest(LiveServerTestCase):
         
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get(self.live_server_url)
+        print(f"live server url={self.live_server_url}")
         self.assertIn('To-Do', self.browser.title, "Browser Title is:%s" % (self.browser.title))
-        # header_text = self.browser.find_element_by_tag_name('h1').text
         header_text = self.browser.find_element(By.TAG_NAME,'h1').text
         self.assertIn('To-Do', header_text)
 
-        # inputbox = self.browser.find_element_by_id('id_newitem')
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertEqual(inputbox.get_attribute('placeholder'), 'Enter a to-do item')
         inputbox.send_keys('Buy peacock feathers')
         inputbox.send_keys(Keys.ENTER)
 
         edith_list_url = self.browser.current_url
+        print(f"edith url={edith_list_url}")
         self.assertRegex(edith_list_url, '/lists/.+')
-
+ 
         self.browser.refresh()
 
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
@@ -54,6 +58,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         #Francis enter home page, there is no Edith's list
         self.browser.get(self.live_server_url)
+        print(f"France url={self.live_server_url}")
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
